@@ -59,6 +59,8 @@ describe('ThreadDetailUseCase', () => {
         .mockImplementation(() => Promise.resolve(expectedThread));
     mockCommentRepository.getThreadComment = jest.fn()
         .mockImplementation(() => Promise.resolve(expectedComment));
+    mockCommentRepository.getLikeCount = jest.fn()
+        .mockImplementation(() => Promise.resolve(1));
     mockReplyRepository.getCommentReplies = jest.fn()
         .mockImplementation(() => Promise.resolve(expectedReplies));
 
@@ -73,6 +75,10 @@ describe('ThreadDetailUseCase', () => {
         .toHaveBeenCalledWith(useCasePayload.threadId);
     expect(mockCommentRepository.getThreadComment)
         .toHaveBeenCalledWith(useCasePayload.threadId);
+    expect(mockCommentRepository.getLikeCount)
+        .toHaveBeenCalledWith(expectedComment[0].id);
+    expect(mockCommentRepository.getLikeCount)
+        .toHaveBeenCalledWith(expectedComment[1].id);
     expect(mockReplyRepository.getCommentReplies)
         .toHaveBeenCalledWith(expectedComment[0].id);
     expect(mockReplyRepository.getCommentReplies)
@@ -101,6 +107,7 @@ describe('ThreadDetailUseCase', () => {
             username: 'dicoding',
             date: '2023-04-24 11.00',
           }],
+          likeCount: 1,
         },
         {
           id: 'comment-222',
@@ -108,6 +115,7 @@ describe('ThreadDetailUseCase', () => {
           username: 'john',
           date: '2023-04-23 17.10',
           replies: [],
+          likeCount: 1,
         }],
       },
     });

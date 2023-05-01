@@ -47,6 +47,9 @@ class ThreadDetailUseCase {
         comment.content = '**komentar telah dihapus**';
       };
       delete comment.is_delete;
+
+      const likeCount = await this._commentRepository.getLikeCount(comment.id);
+      comment.likeCount = likeCount ? likeCount : 0;
     };
     return comments;
   };

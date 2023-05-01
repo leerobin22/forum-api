@@ -206,4 +206,129 @@ describe('CommentRepositoryPostgres', () => {
       expect(comment[0].is_delete).toStrictEqual(newComment.isDelete);
     });
   });
+
+  describe('likeDislikeComment function', () => {
+    it('should like comment successfully', async () => {
+      const newUser = {
+        id: 'user-123',
+        username: 'dicoding',
+      };
+      const newThread = {
+        id: 'thread-123',
+        title: 'new Title',
+        body: 'new Body',
+        owner: 'user-123',
+      };
+      const newComment = {
+        id: 'comment-123',
+        threadId: 'thread-123',
+        content: 'new content',
+        owner: 'user-123',
+        date: '2023-04-25 16.00',
+        isDelete: false,
+      };
+
+      await UsersTableTestHelper.addUser(newUser);
+      await ThreadTableTestHelper.addThread(newThread);
+      await ThreadTableTestHelper.addThreadComment(newComment);
+
+      const payload = {
+        commentId: 'comment-123',
+        owner: 'user-123',
+      };
+
+      const fakeIdGeneratorIdGenerator = () => '123';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGeneratorIdGenerator);
+
+      await commentRepositoryPostgres.likeDislikeComment(payload);
+      const likedComment = await ThreadTableTestHelper.getCommentLike(payload);
+
+      expect(likedComment).toHaveLength(1);
+      expect(likedComment[0].comment_id).toStrictEqual(payload.commentId);
+      expect(likedComment[0].owner).toStrictEqual(payload.owner);
+    });
+    it('should dislike comment successfully', async () => {
+      const newUser = {
+        id: 'user-123',
+        username: 'dicoding',
+      };
+      const newThread = {
+        id: 'thread-123',
+        title: 'new Title',
+        body: 'new Body',
+        owner: 'user-123',
+      };
+      const newComment = {
+        id: 'comment-123',
+        threadId: 'thread-123',
+        content: 'new content',
+        owner: 'user-123',
+        date: '2023-04-25 16.00',
+        isDelete: false,
+      };
+
+      await UsersTableTestHelper.addUser(newUser);
+      await ThreadTableTestHelper.addThread(newThread);
+      await ThreadTableTestHelper.addThreadComment(newComment);
+
+      const payload = {
+        id: 'likes-123',
+        commentId: 'comment-123',
+        owner: 'user-123',
+        date: '2023-05-02 20.00',
+      };
+
+      await ThreadTableTestHelper.addCommentLike(payload);
+
+      const fakeIdGeneratorIdGenerator = () => '123';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGeneratorIdGenerator);
+
+      await commentRepositoryPostgres.likeDislikeComment(payload);
+      const likedComment = await ThreadTableTestHelper.getCommentLike(payload);
+
+      expect(likedComment).toHaveLength(0);
+    });
+  });
+  describe('getLikeCount function', () => {
+    it('should get comment like count successfully', async () => {
+      const newUser = {
+        id: 'user-123',
+        username: 'dicoding',
+      };
+      const newThread = {
+        id: 'thread-123',
+        title: 'new Title',
+        body: 'new Body',
+        owner: 'user-123',
+      };
+      const newComment = {
+        id: 'comment-123',
+        threadId: 'thread-123',
+        content: 'new content',
+        owner: 'user-123',
+        date: '2023-04-25 16.00',
+        isDelete: false,
+      };
+
+      await UsersTableTestHelper.addUser(newUser);
+      await ThreadTableTestHelper.addThread(newThread);
+      await ThreadTableTestHelper.addThreadComment(newComment);
+
+      const payload = {
+        id: 'likes-123',
+        commentId: 'comment-123',
+        owner: 'user-123',
+        date: '2023-05-02 20.00',
+      };
+
+      await ThreadTableTestHelper.addCommentLike(payload);
+
+      const fakeIdGeneratorIdGenerator = () => '123';
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGeneratorIdGenerator);
+
+      const likeCount = await commentRepositoryPostgres.getLikeCount('comment-123');
+
+      expect(likeCount).toStrictEqual(1);
+    });
+  });
 });
