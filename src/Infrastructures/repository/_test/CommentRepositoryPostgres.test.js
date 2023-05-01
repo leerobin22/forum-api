@@ -326,7 +326,7 @@ describe('CommentRepositoryPostgres', () => {
       const fakeIdGeneratorIdGenerator = () => '123';
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGeneratorIdGenerator);
 
-      const likeCount = await commentRepositoryPostgres.getlikeCount('comment-123');
+      const likeCount = await commentRepositoryPostgres.getLikeCount('comment-123');
 
       expect(likeCount).toStrictEqual(1);
     });
