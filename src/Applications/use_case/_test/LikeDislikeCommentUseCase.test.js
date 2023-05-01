@@ -1,14 +1,14 @@
 const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
-const DeleteThreadCommentUseCase = require('../DeleteThreadCommentUseCase');
+const LikeDislikeCommentUseCase = require('../LikeDislikeCommentUseCase');
 const CommentRepository = require('../../../Domains/comments/CommentRepository');
 
-describe('DeleteThreadCommentUseCase', () => {
+describe('LikeDislikeCommentUseCase', () => {
   it('should thow error if use case payload does not contain threadId and commentId', async () => {
     const useCasePayload = {};
-    const deleteThreadComentUseCase = new DeleteThreadCommentUseCase({});
+    const likeDislikeCommentUseCase = new LikeDislikeCommentUseCase({});
 
-    await expect(deleteThreadComentUseCase.execute(useCasePayload))
-        .rejects.toThrowError('DELETE_THREAD_COMMENT_USE_CASE.NOT_CONTAIN_REQUIRED_ATTRIBUTES');
+    await expect(likeDislikeCommentUseCase.execute(useCasePayload))
+        .rejects.toThrowError('LIKE_DISLIKE_COMMENT_USE_CASE.NOT_CONTAIN_REQUIRED_ATTRIBUTES');
   });
   it('should thow error if use case payload does not contain required attributes types', async () => {
     const useCasePayload = {
@@ -16,12 +16,12 @@ describe('DeleteThreadCommentUseCase', () => {
       commentId: true,
       owner: {},
     };
-    const deleteThreadComentUseCase = new DeleteThreadCommentUseCase({});
+    const likeDislikeCommentUseCase = new LikeDislikeCommentUseCase({});
 
-    await expect(deleteThreadComentUseCase.execute(useCasePayload))
-        .rejects.toThrowError('DELETE_THREAD_COMMENT_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION');
+    await expect(likeDislikeCommentUseCase.execute(useCasePayload))
+        .rejects.toThrowError('LIKE_DISLIKE_COMMENT_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
-  it('should orchestrating delete thread comment action correctly', async () => {
+  it('should orchestrating like dislike comment action correctly', async () => {
     const useCasePayload = {
       threadId: 'thread-123',
       commentId: 'comment-123',
@@ -35,25 +35,21 @@ describe('DeleteThreadCommentUseCase', () => {
         .mockImplementation(() => Promise.resolve());
     mockCommentRepository.checkThreadCommentAvailability = jest.fn()
         .mockImplementation(() => Promise.resolve());
-    mockCommentRepository.checkThreadCommentOwner = jest.fn()
-        .mockImplementation(() => Promise.resolve());
-    mockCommentRepository.deleteThreadComment = jest.fn()
+    mockCommentRepository.likeDislikeComment = jest.fn()
         .mockImplementation(() => Promise.resolve());
 
-    const deleteThreadComentUseCase = new DeleteThreadCommentUseCase({
+    const likeDislikeCommentUseCase = new LikeDislikeCommentUseCase({
       threadRepository: mockThreadRepository,
       commentRepository: mockCommentRepository,
     });
 
-    await deleteThreadComentUseCase.execute(useCasePayload);
+    await likeDislikeCommentUseCase.execute(useCasePayload);
 
     expect(mockThreadRepository.checkThreadAvailability)
         .toHaveBeenCalledWith(useCasePayload.threadId);
     expect(mockCommentRepository.checkThreadCommentAvailability)
         .toHaveBeenCalledWith(useCasePayload.commentId);
-    expect(mockCommentRepository.checkThreadCommentOwner)
+    expect(mockCommentRepository.likeDislikeComment)
         .toHaveBeenCalledWith(useCasePayload);
-    expect(mockCommentRepository.deleteThreadComment)
-        .toHaveBeenCalledWith(useCasePayload.commentId);
   });
 });

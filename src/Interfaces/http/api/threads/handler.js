@@ -4,6 +4,7 @@ const DeleteThreadCommentUseCase = require('../../../../Applications/use_case/De
 const ThreadDetailUseCase = require('../../../../Applications/use_case/ThreadDetailUseCase');
 const AddCommentReplyUseCase = require('../../../../Applications/use_case/AddCommentReplyUseCase');
 const DeleteCommentReplyUseCase = require('../../../../Applications/use_case/DeleteCommentReplyUseCase');
+const LikeDislikeCommentUseCase = require('../../../../Applications/use_case/LikeDislikeCommentUseCase');
 
 class ThreadsHandler {
   constructor(container) {
@@ -15,6 +16,7 @@ class ThreadsHandler {
     this.getThreadDetailHandler = this.getThreadDetailHandler.bind(this);
     this.postCommentReplyHandler = this.postCommentReplyHandler.bind(this);
     this.deleteCommentReplyHandler = this.deleteCommentReplyHandler.bind(this);
+    this.putLikeDislikeCommentHandler = this.putLikeDislikeCommentHandler.bind(this);
   }
 
   async postThreadHandler(request, h) {
@@ -124,6 +126,22 @@ class ThreadsHandler {
     response.code(200);
     return response;
   };
+  async putLikeDislikeCommentHandler(request, h) {
+    const likeDislikeCommentUseCase = this._container.getInstance(LikeDislikeCommentUseCase.name);
+    const owner = request.auth.credentials.id;
+    const useCasePayload = {
+      threadId: request.params.threadId,
+      commentId: request.params.commentId,
+      owner,
+    };
+
+    await likeDislikeCommentUseCase.execute(useCasePayload);
+    const response = h.response({
+      status: 'success',
+    });
+    response.code(200);
+    return response;
+  }
 }
 
 module.exports = ThreadsHandler;
